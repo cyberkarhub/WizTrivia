@@ -1,14 +1,15 @@
 <?php
 /**
  * Plugin Name: WizTrivia
- * Plugin URI: https://wizconsults.com
- * Description: AI-powered trivia game with automatically generated questions
- * Version: 1.0.0
- * Author: Wizconsults.com
- * Author URI: https://wizconsults.com
+ * Plugin URI: https://github.com/cyberkarhub/WizTrivia
+ * Description: AI-powered trivia game plugin for WordPress
+ * Version: 2.0.0
+ * Author: CyberKarHub
+ * Author URI: https://github.com/cyberkarhub
+ * License: GPL-2.0+
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain: wiztrivia
  * Domain Path: /languages
- * License: GPL-2.0+
  */
 
 // If this file is called directly, abort.
@@ -18,145 +19,114 @@ if (!defined('ABSPATH')) {
 
 // Define plugin constants
 define('WIZTRIVIA_VERSION', '2.0.0');
-define('WIZTRIVIA_PATH', plugin_dir_path(__FILE__));
-define('WIZTRIVIA_URL', plugin_dir_url(__FILE__));
-define('WIZTRIVIA_BASENAME', plugin_basename(__FILE__));
-define('WIZTRIVIA_DATA_DIR', WIZTRIVIA_PATH . 'data/');
+define('WIZTRIVIA_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('WIZTRIVIA_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('WIZTRIVIA_DATA_DIR', WIZTRIVIA_PLUGIN_DIR . 'data/');
+define('WIZTRIVIA_ADMIN_URL', admin_url('admin.php?page=wiztrivia'));
 
-// Create data directory if it doesn't exist
-function wiztrivia_create_data_directory() {
-    if (!file_exists(WIZTRIVIA_DATA_DIR)) {
-        wp_mkdir_p(WIZTRIVIA_DATA_DIR);
-        
-        // Create a .htaccess file to prevent direct access
-        $htaccess_content = "# Prevent directory listing\nOptions -Indexes\n\n# Prevent direct access to files\n<FilesMatch \".*\">\nOrder Allow,Deny\nDeny from all\n</FilesMatch>";
-        file_put_contents(WIZTRIVIA_DATA_DIR . '.htaccess', $htaccess_content);
-        
-        // Create an index.php file as an additional security measure
-        file_put_contents(WIZTRIVIA_DATA_DIR . 'index.php', '<?php // Silence is golden');
-    }
-}
+// Include required files
+require_once WIZTRIVIA_PLUGIN_DIR . 'php/functions.php';
+require_once WIZTRIVIA_PLUGIN_DIR . 'php/ajax-handlers.php';
+require_once WIZTRIVIA_PLUGIN_DIR . 'admin/class-wiztrivia-admin.php';
+require_once WIZTRIVIA_PLUGIN_DIR . 'admin/partials/class-wiztrivia-question-generator.php';
 
-// Register activation hook
-register_activation_hook(__FILE__, 'wiztrivia_activate');
-
-function wiztrivia_activate() {
-    // Create data directory
-    wiztrivia_create_data_directory();
-    
-    // Create questions file if it doesn't exist
-    if (!file_exists(WIZTRIVIA_DATA_DIR . 'questions.json')) {
-        file_put_contents(WIZTRIVIA_DATA_DIR . 'questions.json', json_encode([]));
-    }
-    
-    // IMPORTANT: No flush_rewrite_rules here - that was causing issues
-}
-
-// Register deactivation hook
-register_deactivation_hook(__FILE__, 'wiztrivia_deactivate');
-
-function wiztrivia_deactivate() {
-    // Keep this empty to avoid issues
-}
-
-// Include necessary files
-require_once WIZTRIVIA_PATH . 'php/functions.php';
-
-// Add admin menu
-function wiztrivia_add_admin_menu() {
+// Admin setup
+function wiztrivia_admin_setup() {
+    // Create admin page
     add_menu_page(
         'WizTrivia', 
         'WizTrivia', 
         'manage_options', 
         'wiztrivia', 
-        'wiztrivia_admin_page', 
+        'wiztrivia_admin_display', 
         'dashicons-games', 
         30
     );
 }
-add_action('admin_menu', 'wiztrivia_add_admin_menu');
+add_action('admin_menu', 'wiztrivia_admin_setup');
 
-// Admin page function
-function wiztrivia_admin_page() {
-    require_once WIZTRIVIA_PATH . 'php/admin.php';
+// Admin display function
+function wiztrivia_admin_display() {
+    require_once WIZTRIVIA_PLUGIN_DIR . 'admin/partials/wiztrivia-admin-display.php';
 }
 
-// Enqueue scripts and styles
-function wiztrivia_enqueue_scripts($hook) {
-    // Only load admin scripts on plugin page
-    if (is_admin() && strpos($hook, 'wiztrivia') !== false) {
-        wp_enqueue_style('wiztrivia-admin-style', 
-            WIZTRIVIA_URL . 'assets/css/admin.css', 
-            [], WIZTRIVIA_VERSION);
-        
-        wp_enqueue_script('wiztrivia-admin-script', 
-            WIZTRIVIA_URL . 'assets/js/admin.js', 
-            ['jquery'], WIZTRIVIA_VERSION, true);
-            
-        wp_localize_script('wiztrivia-admin-script', 'wiztriviaAdminData', [
-            'nonce' => wp_create_nonce('wiztrivia_ajax_nonce'),
-            'ajaxurl' => admin_url('admin-ajax.php')
-        ]);
+// Register admin scripts
+function wiztrivia_admin_scripts($hook) {
+    if ('toplevel_page_wiztrivia' !== $hook) {
+        return;
     }
+    
+    wp_enqueue_style('wiztrivia-admin-css', WIZTRIVIA_PLUGIN_URL . 'assets/css/admin.css', array(), WIZTRIVIA_VERSION);
+    wp_enqueue_script('wiztrivia-admin-js', WIZTRIVIA_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), WIZTRIVIA_VERSION, true);
+    
+    wp_localize_script('wiztrivia-admin-js', 'wiztrivia_ajax', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('wiztrivia_ajax_nonce'),
+    ));
 }
-add_action('admin_enqueue_scripts', 'wiztrivia_enqueue_scripts');
+add_action('admin_enqueue_scripts', 'wiztrivia_admin_scripts');
+
+// Register frontend scripts
+function wiztrivia_enqueue_scripts() {
+    wp_enqueue_style('wiztrivia-css', WIZTRIVIA_PLUGIN_URL . 'assets/css/game.css', array(), WIZTRIVIA_VERSION);
+    wp_enqueue_script('wiztrivia-js', WIZTRIVIA_PLUGIN_URL . 'assets/js/game.js', array('jquery'), WIZTRIVIA_VERSION, true);
+    
+    wp_localize_script('wiztrivia-js', 'wiztrivia_ajax', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('wiztrivia_game_nonce'),
+    ));
+}
+add_action('wp_enqueue_scripts', 'wiztrivia_enqueue_scripts');
 
 // Register shortcode
-function wiztrivia_game_shortcode($atts) {
-    // Enqueue game styles and scripts
-    wp_enqueue_style('wiztrivia-game-style', 
-        WIZTRIVIA_URL . 'assets/css/game.css', 
-        [], WIZTRIVIA_VERSION);
+function wiztrivia_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'topic' => '',
+        'difficulty' => 'all', // 'all', 'easy', 'medium', 'hard', 'advanced', 'expert'
+        'count' => 10,
+    ), $atts);
     
-    wp_enqueue_script('wiztrivia-game-script', 
-        WIZTRIVIA_URL . 'assets/js/game.js', 
-        ['jquery'], WIZTRIVIA_VERSION, true);
-    
-    // Get attributes
-    $atts = shortcode_atts([
-        'limit' => 10,
-        'category' => '',
-    ], $atts, 'wiztrivia');
-    
-    // Include game file and return its content
     ob_start();
-    include WIZTRIVIA_PATH . 'php/game.php';
+    require WIZTRIVIA_PLUGIN_DIR . 'php/game.php';
     return ob_get_clean();
 }
-add_shortcode('wiztrivia', 'wiztrivia_game_shortcode');
+add_shortcode('wiztrivia', 'wiztrivia_shortcode');
 
-// Helper functions
-
-/**
- * Get questions from data store
- */
-function wiztrivia_get_questions() {
-    $questions_file = WIZTRIVIA_DATA_DIR . 'questions.json';
-    
-    if (file_exists($questions_file)) {
-        $questions = json_decode(file_get_contents($questions_file), true);
-        return is_array($questions) ? $questions : [];
+// Activation hook
+register_activation_hook(__FILE__, 'wiztrivia_activate');
+function wiztrivia_activate() {
+    // Create necessary directories
+    if (!file_exists(WIZTRIVIA_DATA_DIR)) {
+        wp_mkdir_p(WIZTRIVIA_DATA_DIR);
+        @chmod(WIZTRIVIA_DATA_DIR, 0755);
     }
     
-    return [];
-}
-
-/**
- * Delete a question by ID
- */
-function wiztrivia_delete_question($id) {
-    $questions = wiztrivia_get_questions();
-    
-    foreach ($questions as $key => $question) {
-        if (isset($question['id']) && $question['id'] == $id) {
-            unset($questions[$key]);
-            file_put_contents(WIZTRIVIA_DATA_DIR . 'questions.json', json_encode(array_values($questions)));
-            return true;
-        }
+    // Set default options if they don't exist
+    if (!get_option('wiztrivia_settings')) {
+        update_option('wiztrivia_settings', array(
+            'ai_provider' => 'deepseek',
+            'ai_api_key' => '',
+            'website_domain' => get_site_url(),
+            'include_ai_knowledge' => 0,
+        ));
     }
-    
-    return false;
 }
 
-// AJAX handlers
-require_once WIZTRIVIA_PATH . 'php/ajax-handlers.php';
+// Deactivation hook
+register_deactivation_hook(__FILE__, 'wiztrivia_deactivate');
+function wiztrivia_deactivate() {
+    // Cleanup code here if needed
+}
+
+// Logging function
+function wiztrivia_log($message, $level = 'info') {
+    // Only log if WP_DEBUG is enabled
+    if (defined('WP_DEBUG') && WP_DEBUG === true) {
+        // Format the message
+        $timestamp = date('Y-m-d H:i:s');
+        $formatted_message = "[{$timestamp}] [{$level}] WizTrivia: {$message}" . PHP_EOL;
+        
+        // Log to debug.log
+        error_log($formatted_message);
+    }
+}

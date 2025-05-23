@@ -1,8 +1,8 @@
 <?php
 /**
- * WizTrivia AJAX Handlers
+ * WizTrivia AJAX Handlers - Updated to use Question Generator class
  * Version: 2.0.0
- * Date: 2025-05-23 10:00:00
+ * Date: 2025-05-23
  * User: cyberkarhub
  */
 
@@ -43,13 +43,13 @@ function wiztrivia_ajax_generate_questions() {
             throw new Exception('Topic is required');
         }
         
-        // Load the question generator class if it hasn't been loaded yet
-        if (!function_exists('wiztrivia_question_generator')) {
-            require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wiztrivia-question-generator.php';
+        // Load the question generator class if it hasn't been loaded
+        if (!class_exists('WizTrivia_Question_Generator')) {
+            require_once WIZTRIVIA_PLUGIN_DIR . 'admin/partials/class-wiztrivia-question-generator.php';
         }
         
-        // Get the question generator instance
-        $question_generator = wiztrivia_question_generator();
+        // Create an instance of our question generator
+        $question_generator = new WizTrivia_Question_Generator();
         
         // Generate questions for all difficulty levels
         $all_new_questions = $question_generator->generate_questions_all_levels(
@@ -80,13 +80,16 @@ function wiztrivia_ajax_generate_questions() {
 }
 add_action('wp_ajax_wiztrivia_generate_questions', 'wiztrivia_ajax_generate_questions');
 
-// Function to retrieve questions
+/**
+ * Get existing questions from file
+ */
 function wiztrivia_get_questions() {
-    // Load the question generator class if it hasn't been loaded yet
-    if (!function_exists('wiztrivia_question_generator')) {
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wiztrivia-question-generator.php';
+    // Load the question generator class if it hasn't been loaded
+    if (!class_exists('WizTrivia_Question_Generator')) {
+        require_once WIZTRIVIA_PLUGIN_DIR . 'admin/partials/class-wiztrivia-question-generator.php';
     }
     
-    // Get the question generator instance and return questions
-    return wiztrivia_question_generator()->get_questions();
+    // Create an instance and get questions
+    $question_generator = new WizTrivia_Question_Generator();
+    return $question_generator->get_questions();
 }

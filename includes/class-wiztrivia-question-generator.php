@@ -2,7 +2,7 @@
 /**
  * WizTrivia Question Generator Class
  * Version: 2.0.0
- * Date: 2025-05-23
+ * Date: 2025-05-23 10:55:21
  * User: cyberkarhub
  */
 
@@ -27,9 +27,19 @@ class WizTrivia_Question_Generator {
     private $settings = null;
     
     /**
+     * Get instance of this class
+     */
+    public static function get_instance() {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    /**
      * Constructor
      */
-    public function __construct() {
+    private function __construct() {
         // Load settings
         $this->settings = get_option('wiztrivia_settings', [
             'ai_provider' => 'deepseek',
@@ -43,66 +53,11 @@ class WizTrivia_Question_Generator {
      * Log information to the debug log
      */
     public function log($message, $level = 'info') {
-        if (function_exists('wiztrivia_log')) {
-            wiztrivia_log($message, $level);
-        } else {
-            // Fallback logging if wiztrivia_log doesn't exist yet
-            if (defined('WP_DEBUG') && WP_DEBUG === true) {
-                $timestamp = date('Y-m-d H:i:s');
-                $formatted_message = "[{$timestamp}] [{$level}] WizTrivia: {$message}" . PHP_EOL;
-                error_log($formatted_message);
-            }
-        }
-    }
-    
-    /**
-     * Ensures the data directory exists and is writable
-     * 
-     * @return bool True if directory exists and is writable
-     * @throws Exception If directory cannot be created or is not writable
-     */
-    public function ensure_data_directory_exists() {
-        if (!defined('WIZTRIVIA_DATA_DIR')) {
-            throw new Exception('WIZTRIVIA_DATA_DIR constant is not defined');
-        }
-        
-        if (!file_exists(WIZTRIVIA_DATA_DIR)) {
-            $this->log("Data directory doesn't exist, creating: " . WIZTRIVIA_DATA_DIR, "info");
-            
-            if (!wp_mkdir_p(WIZTRIVIA_DATA_DIR)) {
-                $this->log("Failed to create data directory: " . WIZTRIVIA_DATA_DIR, "error");
-                throw new Exception("Failed to create data directory. Please check server permissions.");
-            }
-            
-            @chmod(WIZTRIVIA_DATA_DIR, 0755);
-            $this->log("Created data directory with permissions 0755", "info");
-        }
-        
-        if (!is_writable(WIZTRIVIA_DATA_DIR)) {
-            $this->log("Data directory is not writable: " . WIZTRIVIA_DATA_DIR, "error");
-            throw new Exception("Data directory exists but is not writable. Please check server permissions.");
-        }
-        
-        return true;
-    }
-    
-    /**
-     * Get file path for questions JSON
-     * 
-     * @return string Full path to questions JSON file
-     */
-    public function get_questions_file_path() {
-        return WIZTRIVIA_DATA_DIR . 'questions.json';
+        wiztrivia_log($message, $level);
     }
     
     /**
      * Generate questions for all difficulty levels
-     * 
-     * @param string $topic Topic to generate questions about
-     * @param string $source_links Optional links to source content
-     * @param int $count_per_level Number of questions per difficulty level
-     * @return array Generated questions
-     * @throws Exception On error
      */
     public function generate_questions_all_levels($topic, $source_links = '', $count_per_level = 5) {
         $this->log("Starting question generation for topic: {$topic}");
@@ -168,10 +123,7 @@ class WizTrivia_Question_Generator {
         $this->log("Total questions generated: " . count($all_new_questions));
         
         // Save the questions
-        $existing_questions = $this->get_questions();
-        $all_questions = array_merge($existing_questions, $all_new_questions);
-        
-        $saved = $this->save_questions($all_questions);
+        $saved = $this->save_questions_to_file($all_new_questions);
         
         if (!$saved) {
             throw new Exception("Failed to save questions to file. Check server permissions.");
@@ -230,51 +182,52 @@ class WizTrivia_Question_Generator {
         
         $this->log("DeepSeek prompt prepared, length: " . strlen($prompt));
         
-        try {
-            // Make API request to DeepSeek with improved error handling
-            $response = wp_remote_post('https://api.deepseek.com/v1/chat/completions', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->settings['ai_api_key'],
-                    'Content-Type' => 'application/json',
+        // Make API request to DeepSeek with improved error handling
+        $response = wp_remote_post('https://api.deepseek.com/v1/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->settings['ai_api_key'],
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'model' => 'deepseek-chat',
+                'messages' => [
+                    ['role' => 'system', 'content' => 'You are a specialist at creating trivia questions about specific website content. You focus on making questions that test actual knowledge of the article content rather than general knowledge. Output format must be valid JSON.'],
+                    ['role' => 'user', 'content' => $prompt]
                 ],
-                'body' => json_encode([
-                    'model' => 'deepseek-chat',
-                    'messages' => [
-                        ['role' => 'system', 'content' => 'You are a specialist at creating trivia questions about specific website content. You focus on making questions that test actual knowledge of the article content rather than general knowledge. Output format must be valid JSON.'],
-                        ['role' => 'user', 'content' => $prompt]
-                    ],
-                    'temperature' => 0.7,
-                ]),
-                'timeout' => 60, // Increased timeout to handle larger responses
-                'httpversion' => '1.1',
-            ]);
-            
-            // Check for network errors
-            if (is_wp_error($response)) {
-                $error_message = $response->get_error_message();
-                $this->log("API Network Error: " . $error_message, "error");
-                return ['error' => 'API Network Error: ' . $error_message];
-            }
-            
-            $response_code = wp_remote_retrieve_response_code($response);
-            $this->log("API Response code: " . $response_code);
-            
-            if ($response_code !== 200) {
-                $body = wp_remote_retrieve_body($response);
-                $this->log("Non-200 response: " . $body, "error");
-                return ['error' => 'DeepSeek API returned status code ' . $response_code . '. Response: ' . substr($body, 0, 200) . '...'];
-            }
-            
-            // Parse the response
-            $body = json_decode(wp_remote_retrieve_body($response), true);
-            
-            // Check for API errors
-            if (isset($body['error'])) {
-                $error_message = $body['error']['message'] ?? 'Unknown API error';
-                $this->log("DeepSeek API Error: " . $error_message, "error");
-                return ['error' => 'DeepSeek API Error: ' . $error_message];
-            }
-            
+                'temperature' => 0.7,
+            ]),
+            'timeout' => 60, // Increased timeout for larger responses
+            'httpversion' => '1.1',
+        ]);
+        
+        // Check for network errors
+        if (is_wp_error($response)) {
+            $error_message = $response->get_error_message();
+            $this->log("API Network Error: " . $error_message, "error");
+            return ['error' => 'API Network Error: ' . $error_message];
+        }
+        
+        $response_code = wp_remote_retrieve_response_code($response);
+        $this->log("API Response code: " . $response_code);
+        
+        if ($response_code !== 200) {
+            $body = wp_remote_retrieve_body($response);
+            $this->log("Non-200 response: " . $body, "error");
+            return ['error' => 'DeepSeek API returned status code ' . $response_code . '. Response: ' . substr($body, 0, 200) . '...'];
+        }
+        
+        // Parse the response
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        // Check for API errors
+        if (isset($body['error'])) {
+            $error_message = $body['error']['message'] ?? 'Unknown API error';
+            $this->log("DeepSeek API Error: " . $error_message, "error");
+            return ['error' => 'DeepSeek API Error: ' . $error_message];
+        }
+        
+        // Try to extract questions from response
+        try {
             // Get content from the response
             $content = $body['choices'][0]['message']['content'] ?? '';
             $this->log("Received content from API, length: " . strlen($content));
@@ -401,11 +354,9 @@ class WizTrivia_Question_Generator {
     
     /**
      * Get existing questions from file
-     * 
-     * @return array Array of questions
      */
     public function get_questions() {
-        $questions_file = $this->get_questions_file_path();
+        $questions_file = WIZTRIVIA_DATA_DIR . 'questions.json';
         
         if (file_exists($questions_file)) {
             try {
@@ -440,38 +391,70 @@ class WizTrivia_Question_Generator {
     }
     
     /**
-     * Save questions to file
+     * Write questions to JSON file
      * 
-     * @param array $questions Questions to save
-     * @return bool Success status
+     * @param array $new_questions The questions to write to file
+     * @return bool Whether the operation was successful
      */
-    public function save_questions($questions) {
-        try {
-            // Ensure directory exists and is writable
-            $this->ensure_data_directory_exists();
-            
-            $questions_file = $this->get_questions_file_path();
-            
-            // Encode the data with nice formatting and UTF-8 support
-            $json_data = json_encode($questions, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            if ($json_data === false) {
-                $this->log("JSON encoding failed: " . json_last_error_msg(), "error");
-                return false;
-            }
-            
-            // Write to file with error checking
-            $write_result = file_put_contents($questions_file, $json_data);
-            if ($write_result === false) {
-                $this->log("Failed to write questions to file: " . $questions_file, "error");
-                return false;
-            }
-            
-            $this->log("Successfully saved " . count($questions) . " questions to file");
-            return true;
-            
-        } catch (Exception $e) {
-            $this->log("Error saving questions: " . $e->getMessage(), "error");
+    public function save_questions_to_file($new_questions) {
+        $this->log("Attempting to save " . count($new_questions) . " questions to file");
+        
+        if (empty($new_questions)) {
+            $this->log("No questions to save, skipping file write");
             return false;
         }
+        
+        // Get existing questions
+        $existing_questions = $this->get_questions();
+        
+        // Merge with new questions
+        $all_questions = array_merge($existing_questions, $new_questions);
+        
+        // Ensure the data directory exists with proper permissions
+        if (!file_exists(WIZTRIVIA_DATA_DIR)) {
+            $this->log("Data directory doesn't exist, creating: " . WIZTRIVIA_DATA_DIR, "info");
+            
+            if (!wp_mkdir_p(WIZTRIVIA_DATA_DIR)) {
+                $this->log("Failed to create data directory: " . WIZTRIVIA_DATA_DIR, "error");
+                return false;
+            }
+            
+            @chmod(WIZTRIVIA_DATA_DIR, 0755);
+            $this->log("Created data directory with permissions 0755", "info");
+        }
+        
+        // Check if directory is writable
+        if (!is_writable(WIZTRIVIA_DATA_DIR)) {
+            $this->log("Data directory is not writable: " . WIZTRIVIA_DATA_DIR, "error");
+            return false;
+        }
+        
+        // Define the questions file path
+        $questions_file = WIZTRIVIA_DATA_DIR . 'questions.json';
+        
+        // Encode questions
+        $json_data = json_encode($all_questions, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if ($json_data === false) {
+            $this->log("JSON encoding failed: " . json_last_error_msg(), "error");
+            return false;
+        }
+        
+        // Write to file
+        $result = file_put_contents($questions_file, $json_data);
+        
+        if ($result === false) {
+            $this->log("Failed to write questions to file", "error");
+            return false;
+        }
+        
+        $this->log("Successfully saved " . count($all_questions) . " questions to file");
+        return true;
     }
+}
+
+/**
+ * Initialize the question generator
+ */
+function wiztrivia_question_generator() {
+    return WizTrivia_Question_Generator::get_instance();
 }
