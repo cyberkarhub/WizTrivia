@@ -24,34 +24,26 @@ define('WIZTRIVIA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WIZTRIVIA_DATA_DIR', WIZTRIVIA_PLUGIN_DIR . 'data/');
 define('WIZTRIVIA_ADMIN_URL', admin_url('admin.php?page=wiztrivia'));
 
-// Include required files
-require_once WIZTRIVIA_PLUGIN_DIR . 'php/functions.php';
-require_once WIZTRIVIA_PLUGIN_DIR . 'php/ajax-handlers.php';
-require_once WIZTRIVIA_PLUGIN_DIR . 'admin/class-wiztrivia-admin.php';
-require_once WIZTRIVIA_PLUGIN_DIR . 'admin/partials/class-wiztrivia-question-generator.php';
+// Include required files with error checking
+$required_files = [
+    'php/functions.php',
+    'php/ajax-handlers.php',
+    'admin/class-wiztrivia-admin.php',
+    'admin/partials/class-wiztrivia-question-generator.php'
+];
 
-// Admin setup
-function wiztrivia_admin_setup() {
-    // Create admin page
-    add_menu_page(
-        'WizTrivia', 
-        'WizTrivia', 
-        'manage_options', 
-        'wiztrivia', 
-        'wiztrivia_admin_display', 
-        'dashicons-games', 
-        30
-    );
-}
-add_action('admin_menu', 'wiztrivia_admin_setup');
-
-// Admin display function
-function wiztrivia_admin_display() {
-    require_once WIZTRIVIA_PLUGIN_DIR . 'admin/partials/wiztrivia-admin-display.php';
+foreach ($required_files as $file) {
+    $file_path = WIZTRIVIA_PLUGIN_DIR . $file;
+    if (file_exists($file_path)) {
+        require_once $file_path;
+    } else {
+        // Log missing file
+        wiztrivia_log("Required file missing: {$file}", 'error');
+    }
 }
 
 /**
- * Register admin menu
+ * Register admin menu - SINGLE REGISTRATION
  */
 function wiztrivia_register_admin_menu() {
     add_menu_page(
@@ -70,7 +62,7 @@ add_action('admin_menu', 'wiztrivia_register_admin_menu');
  * Display admin page
  */
 function wiztrivia_admin_page() {
-    $file_path = __DIR__ . '/admin/partials/wiztrivia-admin-display.php';
+    $file_path = WIZTRIVIA_PLUGIN_DIR . 'admin/partials/wiztrivia-admin-display.php';
     if (file_exists($file_path)) {
         include_once $file_path;
     } else {
@@ -110,12 +102,17 @@ add_action('wp_enqueue_scripts', 'wiztrivia_enqueue_scripts');
 function wiztrivia_shortcode($atts) {
     $atts = shortcode_atts(array(
         'topic' => '',
-        'difficulty' => 'all', // 'all', 'easy', 'medium', 'hard', 'advanced', 'expert'
+        'difficulty' => 'all',
         'count' => 10,
     ), $atts);
     
     ob_start();
-    require WIZTRIVIA_PLUGIN_DIR . 'php/game.php';
+    $game_file = WIZTRIVIA_PLUGIN_DIR . 'php/game.php';
+    if (file_exists($game_file)) {
+        require $game_file;
+    } else {
+        echo '<p>WizTrivia game file not found.</p>';
+    }
     return ob_get_clean();
 }
 add_shortcode('wiztrivia', 'wiztrivia_shortcode');
