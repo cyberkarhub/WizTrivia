@@ -39,22 +39,80 @@ if (!function_exists('wiztrivia_log')) {
     }
 }
 
-// Include required files with error checking - REMOVED DUPLICATE
-$required_files = [
-    'includes/class-wiztrivia-settings.php',
-    'php/functions.php',
-    'php/ajax-handlers.php',
-    'admin/class-wiztrivia-admin.php',
-    'admin/partials/class-wiztrivia-question-generator.php'  // ← KEEP ONLY THIS ONE
-];
+// SAFE ACTIVATION HOOK - Load files only when needed
+register_activation_hook(__FILE__, 'wiztrivia_activate');
+function wiztrivia_activate() {
+    try {
+        // Create necessary directories with error handling
+        if (!file_exists(WIZTRIVIA_DATA_DIR)) {
+            if (!wp_mkdir_p(WIZTRIVIA_DATA_DIR)) {
+                throw new Exception('Failed to create data directory: ' . WIZTRIVIA_DATA_DIR);
+            }
+            @chmod(WIZTRIVIA_DATA_DIR, 0755);
+        }
+        
+        // Check if directory is writable
+        if (!is_writable(WIZTRIVIA_DATA_DIR)) {
+            throw new Exception('Data directory is not writable: ' . WIZTRIVIA_DATA_DIR);
+        }
+        
+        // Set default options if they don't exist - with validation
+        $default_settings = array(
+            'ai_provider' => 'deepseek',
+            'ai_api_key' => '',
+            'website_domain' => get_site_url(),
+            'include_ai_knowledge' => 0,
+        );
+        
+        if (!get_option('wiztrivia_settings')) {
+            update_option('wiztrivia_settings', $default_settings);
+        }
+        
+        // Create initial empty questions file if it doesn't exist
+        $questions_file = WIZTRIVIA_DATA_DIR . 'questions.json';
+        if (!file_exists($questions_file)) {
+            $initial_questions = array();
+            $json_data = json_encode($initial_questions, JSON_PRETTY_PRINT);
+            if (file_put_contents($questions_file, $json_data) === false) {
+                throw new Exception('Failed to create initial questions file');
+            }
+        }
+        
+        wiztrivia_log('Plugin activated successfully', 'info');
+        
+    } catch (Exception $e) {
+        wiztrivia_log('Activation error: ' . $e->getMessage(), 'error');
+        
+        // Deactivate the plugin and show error
+        deactivate_plugins(plugin_basename(__FILE__));
+        wp_die(
+            'WizTrivia Plugin Activation Error: ' . $e->getMessage() . 
+            '<br><br>Please check file permissions and try again.' . 
+            '<br><a href="' . admin_url('plugins.php') . '">&laquo; Return to Plugins</a>'
+        );
+    }
+}
 
-foreach ($required_files as $file) {
-    $file_path = WIZTRIVIA_PLUGIN_DIR . $file;
-    if (file_exists($file_path)) {
-        require_once $file_path;
-    } else {
-        // Log missing file
-        wiztrivia_log("Required file missing: {$file}", 'error');
+// DEFERRED FILE LOADING - Only load files after WordPress is fully initialized
+add_action('init', 'wiztrivia_load_required_files');
+function wiztrivia_load_required_files() {
+    // Include required files with error checking - ONLY AFTER INIT
+    $required_files = [
+        'includes/class-wiztrivia-settings.php',
+        'php/functions.php',
+        'php/ajax-handlers.php',
+        'admin/class-wiztrivia-admin.php',
+        'admin/partials/class-wiztrivia-question-generator.php'
+    ];
+
+    foreach ($required_files as $file) {
+        $file_path = WIZTRIVIA_PLUGIN_DIR . $file;
+        if (file_exists($file_path)) {
+            require_once $file_path;
+        } else {
+            // Log missing file but don't fatal error
+            wiztrivia_log("Required file missing: {$file}", 'warning');
+        }
     }
 }
 
@@ -133,28 +191,9 @@ function wiztrivia_shortcode($atts) {
 }
 add_shortcode('wiztrivia', 'wiztrivia_shortcode');
 
-// Activation hook
-register_activation_hook(__FILE__, 'wiztrivia_activate');
-function wiztrivia_activate() {
-    // Create necessary directories
-    if (!file_exists(WIZTRIVIA_DATA_DIR)) {
-        wp_mkdir_p(WIZTRIVIA_DATA_DIR);
-        @chmod(WIZTRIVIA_DATA_DIR, 0755);
-    }
-    
-    // Set default options if they don't exist
-    if (!get_option('wiztrivia_settings')) {
-        update_option('wiztrivia_settings', array(
-            'ai_provider' => 'deepseek',
-            'ai_api_key' => '',
-            'website_domain' => get_site_url(),
-            'include_ai_knowledge' => 0,
-        ));
-    }
-}
-
 // Deactivation hook
 register_deactivation_hook(__FILE__, 'wiztrivia_deactivate');
 function wiztrivia_deactivate() {
     // Cleanup code here if needed
+    wiztrivia_log('Plugin deactivated', 'info');
 }
