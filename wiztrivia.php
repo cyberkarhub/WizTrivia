@@ -41,6 +41,7 @@ function wiztrivia_log($message, $level = 'info') {
 $required_files = [
     'php/functions.php',
     'php/ajax-handlers.php',
+    'includes/class-wiztrivia-settings.php',  // ← ADDED THIS LINE
     'admin/class-wiztrivia-admin.php',
     'admin/partials/class-wiztrivia-question-generator.php'
 ];
