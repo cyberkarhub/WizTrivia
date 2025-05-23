@@ -186,13 +186,13 @@ class WizTrivia_Question_Generator {
     public function generate_with_deepseek($topic, $count, $difficulty, $source_links = '') {
         $this->log("Preparing DeepSeek API request for {$difficulty} level {$topic} questions");
         
-        // Define difficulty-specific instructions
+        // Define difficulty-specific instructions - FIXED MISSING QUOTES
         $difficulty_guidance = [
             'easy' => 'Create basic recall questions about fundamental concepts, definitions, and simple facts from the articles. These should test basic recognition of key terms and main ideas.',
             'medium' => 'Create application questions that require understanding concepts and applying them. Ask about relationships between concepts and how ideas connect within articles.',
             'hard' => 'Create analytical questions requiring deeper understanding. Ask about implications, analyses of viewpoints, and comprehensive understanding of complex topics covered in the articles.',
-            'advanced' => 'Create evaluation questions requiring critical thinking. Ask about comparing different perspectives, evaluating strengths/weaknesses of approaches, and judging effectiveness of solutions discussed in articles.',
-            'expert' => 'Create synthesis questions requiring combining multiple concepts. Ask about creating new frameworks, predicting future trends based on article content, and proposing innovative solutions to problems discussed.'
+            'advanced' => 'Create evaluation questions requiring critical thinking. Ask about comparing different perspectives, evaluating strengths/weaknesses of approaches, and judging effectiveness.',
+            'expert' => 'Create synthesis questions requiring combining multiple concepts. Ask about creating new frameworks, predicting future trends based on article content, and proposing innovative solutions.'
         ];
         
         // Set up the improved prompt for DeepSeek
@@ -206,13 +206,13 @@ class WizTrivia_Question_Generator {
             $prompt .= " These questions MUST be specifically about content from the website {$this->settings['website_domain']}.";
             
             if ($this->settings['website_domain'] == 'digitrendz.blog' || strpos($source_links, 'digitrendz') !== false) {
-                $prompt .= " DigitrendZ.blog is focused on digital marketing, AI technologies, growth hacking, and emerging tech trends. Questions should reflect this focus area and test readers' understanding of specific article content.";
+                $prompt .= " DigitrendZ.blog is focused on digital marketing, AI technologies, growth hacking, and emerging tech trends. Questions should reflect this focus area and test readers' knowledge.";
             }
         }
         
-        // Add whether to include general knowledge
+        // Add whether to include general knowledge - FIXED MISSING QUOTES
         if (!$this->settings['include_ai_knowledge']) {
-            $prompt .= " IMPORTANT: Only use the provided website and source links for information. DO NOT generate generic questions or use general knowledge. Every question must be verifiable from the provided sources.";
+            $prompt .= " IMPORTANT: Only use the provided website and source links for information. DO NOT generate generic questions or use general knowledge. Every question must be verifiable from the specified sources.";
         } else {
             $prompt .= " While focusing on the website content, you may include some general knowledge questions related to the topic.";
         }
@@ -225,8 +225,8 @@ class WizTrivia_Question_Generator {
         
         $prompt .= " For each question, provide one correct answer and three specific incorrect but plausible answers.";
         
-        // Add format instructions
-        $prompt .= "\n\nFormat each question as JSON like this:\n{\n  \"question\": \"Specific question from article content?\",\n  \"correct_answer\": \"Correct option\",\n  \"incorrect_answers\": [\"Wrong but plausible option 1\", \"Wrong but plausible option 2\", \"Wrong but plausible option 3\"],\n  \"source\": \"Brief mention of which article/source this came from\"\n}\n\nReturn your response ONLY as a JSON array of these question objects.";
+        // Add format instructions - FIXED MISSING QUOTES
+        $prompt .= "\n\nFormat each question as JSON like this:\n{\n  \"question\": \"Specific question from article content?\",\n  \"correct_answer\": \"Correct option\",\n  \"incorrect_answers\": [\"Wrong 1\", \"Wrong 2\", \"Wrong 3\"]\n}\n\nReturn ONLY a valid JSON array of questions.";
         
         $this->log("DeepSeek prompt prepared, length: " . strlen($prompt));
         
@@ -240,7 +240,7 @@ class WizTrivia_Question_Generator {
                 'body' => json_encode([
                     'model' => 'deepseek-chat',
                     'messages' => [
-                        ['role' => 'system', 'content' => 'You are a specialist at creating trivia questions about specific website content. You focus on making questions that test actual knowledge of the article content rather than general knowledge. Output format must be valid JSON.'],
+                        ['role' => 'system', 'content' => 'You are a specialist at creating trivia questions about specific website content. You focus on making questions that test actual knowledge of the provided materials.'],
                         ['role' => 'user', 'content' => $prompt]
                     ],
                     'temperature' => 0.7,

@@ -11,17 +11,8 @@ if (!defined('ABSPATH')) {
     die;
 }
 
-function wiztrivia_log($message, $level = 'info') {
-    // Only log if WP_DEBUG is enabled
-    if (defined('WP_DEBUG') && WP_DEBUG === true) {
-        // Format the message
-        $timestamp = date('Y-m-d H:i:s');
-        $formatted_message = "[{$timestamp}] [{$level}] WizTrivia: {$message}" . PHP_EOL;
-        
-        // Log to debug.log
-        error_log($formatted_message);
-    }
-}
+// REMOVE THE DUPLICATE wiztrivia_log FUNCTION FROM HERE (lines 14-24)
+// It's already defined in wiztrivia.php
 
 // AJAX handler for generating questions
 function wiztrivia_ajax_generate_questions() {

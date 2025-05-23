@@ -24,26 +24,28 @@ define('WIZTRIVIA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WIZTRIVIA_DATA_DIR', WIZTRIVIA_PLUGIN_DIR . 'data/');
 define('WIZTRIVIA_ADMIN_URL', admin_url('admin.php?page=wiztrivia'));
 
-// Logging function - MOVED TO TOP
-function wiztrivia_log($message, $level = 'info') {
-    // Only log if WP_DEBUG is enabled
-    if (defined('WP_DEBUG') && WP_DEBUG === true) {
-        // Format the message
-        $timestamp = date('Y-m-d H:i:s');
-        $formatted_message = "[{$timestamp}] [{$level}] WizTrivia: {$message}" . PHP_EOL;
-        
-        // Log to debug.log
-        error_log($formatted_message);
+// Logging function - MOVED TO TOP TO AVOID CONFLICTS
+if (!function_exists('wiztrivia_log')) {
+    function wiztrivia_log($message, $level = 'info') {
+        // Only log if WP_DEBUG is enabled
+        if (defined('WP_DEBUG') && WP_DEBUG === true) {
+            // Format the message
+            $timestamp = date('Y-m-d H:i:s');
+            $formatted_message = "[{$timestamp}] [{$level}] WizTrivia: {$message}" . PHP_EOL;
+            
+            // Log to debug.log
+            error_log($formatted_message);
+        }
     }
 }
 
-// Include required files with error checking
+// Include required files with error checking - REMOVED DUPLICATE
 $required_files = [
+    'includes/class-wiztrivia-settings.php',
     'php/functions.php',
     'php/ajax-handlers.php',
-    'includes/class-wiztrivia-settings.php',  // ← ADDED THIS LINE
     'admin/class-wiztrivia-admin.php',
-    'admin/partials/class-wiztrivia-question-generator.php'
+    'admin/partials/class-wiztrivia-question-generator.php'  // ← KEEP ONLY THIS ONE
 ];
 
 foreach ($required_files as $file) {
