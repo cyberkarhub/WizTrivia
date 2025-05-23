@@ -4,7 +4,7 @@
  * Plugin URI: https://wizconsults.com
  * Description: AI-powered trivia game with automatically generated questions
  * Version: 1.0.0
- * Author: cyberkarhub
+ * Author: Wizconsults.com
  * Author URI: https://wizconsults.com
  * Text Domain: wiztrivia
  * Domain Path: /languages
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('WIZTRIVIA_VERSION', '1.0.0');
+define('WIZTRIVIA_VERSION', '2.0.0');
 define('WIZTRIVIA_PATH', plugin_dir_path(__FILE__));
 define('WIZTRIVIA_URL', plugin_dir_url(__FILE__));
 define('WIZTRIVIA_BASENAME', plugin_basename(__FILE__));
