@@ -1,0 +1,842 @@
+/**
+ * WizTrivia Admin Stylesheet
+ * Version: 2.2.0
+ * Date: 2025-05-23 08:10:06
+ * User: cyberkarhub
+ *
+ * This file contains all the styles for the WizTrivia admin interface
+ */
+
+/* General Admin Styles
+-------------------------------------------------------------- */
+.wiztrivia-admin-wrap {
+    margin: 20px 0;
+    max-width: 1200px;
+}
+
+.wiztrivia-admin-wrap * {
+    box-sizing: border-box;
+}
+
+.wiztrivia-admin-header {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.wiztrivia-admin-header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.wiztrivia-admin-header h1 img {
+    margin-right: 10px;
+    width: 36px;
+    height: 36px;
+}
+
+.wiztrivia-admin-header .version {
+    font-size: 12px;
+    color: #757575;
+    font-weight: normal;
+    margin-left: 10px;
+}
+
+.wiztrivia-admin-content {
+    position: relative;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    min-height: 400px;
+}
+
+/* Admin Tabs Navigation
+-------------------------------------------------------------- */
+.wiztrivia-admin-tabs {
+    display: flex;
+    border-bottom: 1px solid #ccd0d4;
+    margin: 0;
+    padding: 0 15px;
+    background: #f8f8f8;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.wiztrivia-admin-tabs li {
+    margin: 0;
+}
+
+.wiztrivia-admin-tabs li a {
+    padding: 15px 20px;
+    display: block;
+    text-decoration: none;
+    color: #646970;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.wiztrivia-admin-tabs li a:hover {
+    color: #2271b1;
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.wiztrivia-admin-tabs li a.active {
+    color: #2271b1;
+    border-bottom-color: #2271b1;
+    background: #fff;
+}
+
+.wiztrivia-admin-tabs li a .dashicons {
+    margin-right: 5px;
+}
+
+/* Tab Content Panels
+-------------------------------------------------------------- */
+.wiztrivia-admin-tab-content {
+    display: none;
+    padding: 25px;
+}
+
+.wiztrivia-admin-tab-content.active {
+    display: block;
+}
+
+/* Form Elements
+-------------------------------------------------------------- */
+.wiztrivia-form-row {
+    margin-bottom: 20px;
+}
+
+.wiztrivia-form-row:last-child {
+    margin-bottom: 0;
+}
+
+.wiztrivia-form-row label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.wiztrivia-form-row input[type="text"],
+.wiztrivia-form-row input[type="number"],
+.wiztrivia-form-row input[type="url"],
+.wiztrivia-form-row input[type="password"],
+.wiztrivia-form-row select,
+.wiztrivia-form-row textarea {
+    width: 100%;
+    max-width: 500px;
+    padding: 8px 12px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.wiztrivia-form-row textarea {
+    min-height: 120px;
+}
+
+.wiztrivia-form-row .description {
+    display: block;
+    margin-top: 5px;
+    color: #757575;
+    font-style: italic;
+    font-size: 13px;
+}
+
+.wiztrivia-form-row .color-picker-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.wiztrivia-form-row .color-preview {
+    width: 32px;
+    height: 32px;
+    border-radius: 3px;
+    border: 1px solid #ccd0d4;
+    margin-right: 8px;
+}
+
+/* Settings Sections
+-------------------------------------------------------------- */
+.wiztrivia-settings-section {
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.wiztrivia-settings-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.wiztrivia-settings-section h2 {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Questions List Table
+-------------------------------------------------------------- */
+.wiztrivia-questions-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.wiztrivia-bulk-actions {
+    display: flex;
+    align-items: center;
+}
+
+.wiztrivia-search-box {
+    position: relative;
+}
+
+.wiztrivia-search-box input[type="text"] {
+    padding-right: 30px;
+    width: 200px;
+}
+
+.wiztrivia-search-box button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.wiztrivia-questions-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.wiztrivia-questions-table th,
+.wiztrivia-questions-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.wiztrivia-questions-table th {
+    background-color: #f8f8f8;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.wiztrivia-questions-table tr:last-child td {
+    border-bottom: none;
+}
+
+.wiztrivia-questions-table tr:hover td {
+    background-color: #f9f9f9;
+}
+
+.wiztrivia-questions-table .checkbox-column {
+    width: 30px;
+}
+
+.wiztrivia-questions-table .actions-column {
+    width: 120px;
+    text-align: right;
+}
+
+.wiztrivia-questions-table .actions-column a {
+    text-decoration: none;
+    margin-left: 8px;
+    color: #2271b1;
+}
+
+.wiztrivia-questions-table .actions-column a:hover {
+    color: #135e96;
+}
+
+.wiztrivia-questions-table .actions-column a.delete {
+    color: #b32d2e;
+}
+
+.wiztrivia-questions-table .actions-column a.delete:hover {
+    color: #8a2424;
+}
+
+.wiztrivia-questions-table .topic-column,
+.wiztrivia-questions-table .difficulty-column {
+    width: 120px;
+}
+
+.wiztrivia-questions-table .difficulty-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.wiztrivia-questions-table .difficulty-easy {
+    background-color: #e7f5e7;
+    color: #0a7b0a;
+}
+
+.wiztrivia-questions-table .difficulty-medium {
+    background-color: #fff8e6;
+    color: #b36000;
+}
+
+.wiztrivia-questions-table .difficulty-hard {
+    background-color: #fae3e3;
+    color: #b32d2e;
+}
+
+.wiztrivia-questions-empty {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.wiztrivia-questions-empty p {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+/* Pagination
+-------------------------------------------------------------- */
+.wiztrivia-pagination {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 0;
+}
+
+.wiztrivia-pagination a,
+.wiztrivia-pagination span {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 3px;
+    border: 1px solid #ddd;
+    background-color: #f7f7f7;
+    text-decoration: none;
+    color: #32373c;
+    border-radius: 3px;
+}
+
+.wiztrivia-pagination span.current {
+    background-color: #2271b1;
+    color: #fff;
+    border-color: #2271b1;
+}
+
+.wiztrivia-pagination a:hover {
+    background-color: #e8e8e8;
+}
+
+/* Question Editor
+-------------------------------------------------------------- */
+.wiztrivia-question-editor {
+    background-color: #f8f8f8;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.wiztrivia-question-editor h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.wiztrivia-answers-list {
+    margin-bottom: 20px;
+}
+
+.wiztrivia-answer-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.wiztrivia-answer-item.correct {
+    background-color: #f0f8ff;
+    border-color: #a2bce8;
+}
+
+.wiztrivia-answer-item input[type="radio"] {
+    margin-right: 10px;
+}
+
+.wiztrivia-answer-item input[type="text"] {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.wiztrivia-answer-item .remove-answer {
+    color: #b32d2e;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.wiztrivia-answer-item .remove-answer:hover {
+    color: #8a2424;
+}
+
+/* AI Generation Form
+-------------------------------------------------------------- */
+.wiztrivia-ai-form {
+    background-color: #f0f8ff;
+    border: 1px solid #c5d6e8;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.wiztrivia-ai-form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.wiztrivia-ai-form h3 .dashicons {
+    margin-right: 8px;
+    color: #2271b1;
+}
+
+.wiztrivia-ai-form .wiztrivia-form-row {
+    margin-bottom: 15px;
+}
+
+.wiztrivia-count-slider {
+    display: flex;
+    align-items: center;
+}
+
+.wiztrivia-count-slider input[type="range"] {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.wiztrivia-count-slider output {
+    min-width: 30px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.wiztrivia-ai-status {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+}
+
+.wiztrivia-ai-status.loading {
+    display: block;
+    text-align: center;
+}
+
+.wiztrivia-ai-status.success {
+    display: block;
+    background-color: #e7f5e7;
+    color: #0a7b0a;
+}
+
+.wiztrivia-ai-status.error {
+    display: block;
+    background-color: #fae3e3;
+    color: #b32d2e;
+}
+
+.wiztrivia-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #2271b1;
+    border-radius: 50%;
+    animation: wiztrivia-spin 1s linear infinite;
+}
+
+@keyframes wiztrivia-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Button Styles
+-------------------------------------------------------------- */
+.wiztrivia-button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #2271b1;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.wiztrivia-button:hover,
+.wiztrivia-button:focus {
+    background-color: #135e96;
+    color: #fff;
+}
+
+.wiztrivia-button.secondary {
+    background-color: #f6f7f7;
+    color: #2c3338;
+    border: 1px solid #c5c5c5;
+}
+
+.wiztrivia-button.secondary:hover,
+.wiztrivia-button.secondary:focus {
+    background-color: #f0f0f1;
+    color: #2c3338;
+    border-color: #8c8f94;
+}
+
+.wiztrivia-button.success {
+    background-color: #198754;
+}
+
+.wiztrivia-button.success:hover,
+.wiztrivia-button.success:focus {
+    background-color: #146c43;
+}
+
+.wiztrivia-button.danger {
+    background-color: #dc3545;
+}
+
+.wiztrivia-button.danger:hover,
+.wiztrivia-button.danger:focus {
+    background-color: #bb2d3b;
+}
+
+.wiztrivia-button.small {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.wiztrivia-button.large {
+    padding: 12px 24px;
+    font-size: 16px;
+}
+
+.wiztrivia-button .dashicons {
+    margin-right: 5px;
+}
+
+.wiztrivia-button:disabled,
+.wiztrivia-button.disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Alerts and Notifications
+-------------------------------------------------------------- */
+.wiztrivia-alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.wiztrivia-alert.info {
+    background-color: #e6f6ff;
+    border-color: #a8d4ff;
+    color: #0047ab;
+}
+
+.wiztrivia-alert.success {
+    background-color: #e7f5e7;
+    border-color: #b6dfb6;
+    color: #0a7b0a;
+}
+
+.wiztrivia-alert.warning {
+    background-color: #fff8e6;
+    border-color: #ffe3a8;
+    color: #b36000;
+}
+
+.wiztrivia-alert.error {
+    background-color: #fae3e3;
+    border-color: #f0a9a9;
+    color: #b32d2e;
+}
+
+.wiztrivia-alert .dashicons {
+    margin-right: 8px;
+}
+
+/* Dashboard Widgets
+-------------------------------------------------------------- */
+.wiztrivia-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.wiztrivia-card {
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 20px;
+}
+
+.wiztrivia-card h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.wiztrivia-card h3 .dashicons {
+    margin-right: 8px;
+    color: #2271b1;
+}
+
+.wiztrivia-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.wiztrivia-stat-item {
+    text-align: center;
+    padding: 10px;
+    flex-grow: 1;
+}
+
+.wiztrivia-stat-item .value {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #2271b1;
+}
+
+.wiztrivia-stat-item .label {
+    font-size: 12px;
+    color: #757575;
+}
+
+/* Responsive Design
+-------------------------------------------------------------- */
+@media (max-width: 782px) {
+    .wiztrivia-admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .wiztrivia-admin-header h1 {
+        margin-bottom: 15px;
+    }
+    
+    .wiztrivia-admin-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .wiztrivia-admin-tabs li a {
+        padding: 12px 15px;
+    }
+    
+    .wiztrivia-questions-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .wiztrivia-search-box {
+        margin-top: 15px;
+        width: 100%;
+    }
+    
+    .wiztrivia-search-box input[type="text"] {
+        width: 100%;
+    }
+    
+    .wiztrivia-questions-table th,
+    .wiztrivia-questions-table td {
+        padding: 10px;
+    }
+    
+    .wiztrivia-questions-table .topic-column,
+    .wiztrivia-questions-table .difficulty-column {
+        display: none;
+    }
+    
+    .wiztrivia-dashboard {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dark Mode Support
+-------------------------------------------------------------- */
+.admin-color-light .wiztrivia-admin-content,
+.admin-color-light .wiztrivia-admin-header,
+.admin-color-light .wiztrivia-card,
+.admin-color-light .wiztrivia-answer-item,
+.admin-color-light .wiztrivia-question-editor {
+    background-color: #f6f7f7;
+}
+
+.admin-color-dark .wiztrivia-admin-tabs li a.active {
+    color: #3582c4;
+    border-bottom-color: #3582c4;
+}
+
+.admin-color-dark .wiztrivia-button {
+    background-color: #2271b1;
+}
+
+.admin-color-dark .wiztrivia-button:hover {
+    background-color: #135e96;
+}
+
+/* Bulk Action UI
+-------------------------------------------------------------- */
+.wiztrivia-bulk-action-wrapper {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.wiztrivia-bulk-action-wrapper select {
+    margin-right: 8px;
+}
+
+.wiztrivia-select-all-wrapper {
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.wiztrivia-select-all-wrapper label {
+    margin-left: 5px;
+    font-size: 13px;
+}
+
+/* AI Provider Selection
+-------------------------------------------------------------- */
+.wiztrivia-provider-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.wiztrivia-provider-option {
+    flex: 1;
+    min-width: 150px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wiztrivia-provider-option:hover {
+    border-color: #bbb;
+}
+
+.wiztrivia-provider-option.selected {
+    border-color: #2271b1;
+    background-color: #f0f8ff;
+}
+
+.wiztrivia-provider-option h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.wiztrivia-provider-option h4 img {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.wiztrivia-provider-option p {
+    font-size: 13px;
+    margin: 0;
+    color: #666;
+}
+
+/* Admin Help Section
+-------------------------------------------------------------- */
+.wiztrivia-help-section {
+    border-top: 1px solid #e5e5e5;
+    margin-top: 30px;
+    padding-top: 20px;
+}
+
+.wiztrivia-help-section h3 {
+    margin-top: 0;
+}
+
+.wiztrivia-help-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.wiztrivia-help-item {
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.wiztrivia-help-item h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.wiztrivia-help-item h4 .dashicons {
+    margin-right: 8px;
+    color: #2271b1;
+}
+
+.wiztrivia-help-item p {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.wiztrivia-help-item a {
+    font-size: 13px;
+    text-decoration: none;
+}

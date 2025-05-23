@@ -1,0 +1,448 @@
+/**
+ * WizTrivia Game Styles - Complete 
+ * Version: 2.2.0
+ * Date: 2025-05-23 07:23:14
+ * User: cyberkarhub
+ */
+
+/* Base container styles */
+.wiztrivia-container {
+    background-color: var(--wiztrivia-bg-color, #000111);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    color: var(--wiztrivia-text-color, white);
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Screen styles (welcome, topic selection, game, results) */
+.wiztrivia-screen {
+    width: 100%;
+}
+
+/* Welcome screen styles */
+.wiztrivia-welcome-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.wiztrivia-title {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: var(--wiztrivia-text-color, white);
+}
+
+.wiztrivia-welcome-message {
+    margin-bottom: 30px;
+    font-size: 1.1em;
+    line-height: 1.5;
+}
+
+.wiztrivia-sponsor {
+    margin-bottom: 20px;
+}
+
+.wiztrivia-sponsor-logo {
+    max-width: 200px;
+    max-height: 100px;
+    border-radius: 4px;
+}
+
+/* Topic selection screen styles */
+.wiztrivia-topic-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.wiztrivia-topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0 30px;
+}
+
+.wiztrivia-topic-button {
+    padding: 15px;
+    background-color: var(--wiztrivia-accent-color, #2271b1);
+    color: var(--wiztrivia-button-text-color, #ffffff);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: all 0.2s ease;
+}
+
+.wiztrivia-topic-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.wiztrivia-secondary-button {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Game screen header */
+.wiztrivia-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.wiztrivia-header h2 {
+    color: var(--wiztrivia-text-color, white);
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.wiztrivia-level {
+    color: var(--wiztrivia-text-color, white);
+    font-weight: bold;
+    text-align: center;
+    flex-basis: 100%;
+    margin-top: 10px;
+}
+
+/* Progress bar styling */
+.wiztrivia-progress-container {
+    width: 100%;
+    background-color: #1a1a2e;
+    border-radius: 4px;
+    margin: 10px 0;
+    height: 10px;
+    overflow: hidden;
+}
+
+#level-progress-bar {
+    height: 100%;
+    background-color: var(--wiztrivia-progress-bar, #2271b1);
+    width: 0;
+    transition: width 0.5s ease;
+}
+
+.wiztrivia-question-progress {
+    text-align: right;
+    color: var(--wiztrivia-text-color, white);
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* Timer styling */
+.wiztrivia-timer-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.wiztrivia-timer-label {
+    color: var(--wiztrivia-text-color, white);
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+#wiztrivia-timer {
+    color: var(--wiztrivia-text-color, white);
+    font-weight: bold;
+    margin-right: 10px;
+    min-width: 45px;
+    text-align: center;
+}
+
+.wiztrivia-timer-bar-container {
+    flex: 1;
+    height: 8px;
+    background-color: #1a1a2e;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#wiztrivia-timer-bar {
+    height: 100%;
+    background-color: var(--wiztrivia-timer-bar, #4caf50);
+    width: 100%;
+    transition: width 1s linear;
+}
+
+#wiztrivia-timer-bar.time-warning {
+    background-color: var(--wiztrivia-timer-warning, #ff5722);
+}
+
+/* Question styling */
+.wiztrivia-question {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--wiztrivia-question-bg, white);
+    border-radius: 4px;
+    color: var(--wiztrivia-question-text, #000);
+    text-align: center;
+}
+
+/* Options styling */
+.wiztrivia-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.wiztrivia-option {
+    padding: 12px 15px;
+    background: var(--wiztrivia-option-bg, #ffffff);
+    color: var(--wiztrivia-option-text, #000000);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.wiztrivia-option:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.wiztrivia-option.hidden {
+    display: none;
+}
+
+.wiztrivia-option.correct-answer {
+    background-color: var(--wiztrivia-correct-bg, #4caf50) !important;
+    border-color: #3e8e41 !important;
+    color: white !important;
+}
+
+.wiztrivia-option.incorrect-answer {
+    background-color: var(--wiztrivia-incorrect-bg, #f44336) !important;
+    border-color: #d32f2f !important;
+    color: white !important;
+}
+
+/* Feedback area */
+.wiztrivia-feedback {
+    background-color: #f5f5f5;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.wiztrivia-feedback.correct {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.wiztrivia-feedback.incorrect {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.wiztrivia-feedback.hidden {
+    display: none;
+}
+
+.wiztrivia-source-link {
+    margin-left: 10px;
+    padding: 2px 8px;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 0.9em;
+    color: var(--wiztrivia-accent-color, #2271b1);
+    border: 1px solid #ddd;
+}
+
+.wiztrivia-source-link:hover {
+    background-color: #e5e5e5;
+    color: #135e96;
+}
+
+/* Footer styling */
+.wiztrivia-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.wiztrivia-score {
+    font-weight: 500;
+    color: var(--wiztrivia-text-color, white);
+}
+
+/* Button styling */
+.wiztrivia-button {
+    padding: 10px 20px;
+    color: var(--wiztrivia-button-text, white) !important;
+    background-color: var(--wiztrivia-accent-color, #2271b1);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.wiztrivia-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.wiztrivia-button:disabled {
+    background-color: #ccc !important;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.wiztrivia-button.hidden {
+    display: none;
+}
+
+/* Lifeline styling */
+.wiztrivia-lifelines {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.wiztrivia-lifeline-button {
+    background-color: var(--wiztrivia-accent-color, #2271b1);
+    color: var(--wiztrivia-button-text, white);
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.wiztrivia-lifeline-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Results screen styling */
+.wiztrivia-results-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.wiztrivia-final-score {
+    font-size: 1.5em;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.wiztrivia-achievement {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 15px 0;
+    text-align: center;
+}
+
+.wiztrivia-article-recommendation {
+    margin: 20px 0;
+}
+
+.wiztrivia-article-link {
+    color: var(--wiztrivia-accent-color, #2271b1);
+    text-decoration: underline;
+}
+
+/* Modal styling */
+.wiztrivia-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+.wiztrivia-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+
+#wiztrivia-modal-title {
+    color: var(--wiztrivia-accent-color, #2271b1);
+    margin-top: 0;
+}
+
+#wiztrivia-modal-body {
+    color: #333333;
+    margin-bottom: 15px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.wiztrivia-article-suggestion {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 15px 0;
+    color: #333333;
+}
+
+.wiztrivia-article-suggestion a {
+    color: var(--wiztrivia-accent-color, #2271b1);
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.wiztrivia-modal-footer {
+    margin-top: 15px;
+}
+
+/* Responsive design */
+@media (min-width: 600px) {
+    .wiztrivia-options {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .wiztrivia-container {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .wiztrivia-title {
+        font-size: 1.8em;
+    }
+    
+    .wiztrivia-topics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .wiztrivia-question {
+        font-size: 16px;
+    }
+    
+    .wiztrivia-button {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+}
