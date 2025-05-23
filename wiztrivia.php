@@ -24,6 +24,19 @@ define('WIZTRIVIA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WIZTRIVIA_DATA_DIR', WIZTRIVIA_PLUGIN_DIR . 'data/');
 define('WIZTRIVIA_ADMIN_URL', admin_url('admin.php?page=wiztrivia'));
 
+// Logging function - MOVED TO TOP
+function wiztrivia_log($message, $level = 'info') {
+    // Only log if WP_DEBUG is enabled
+    if (defined('WP_DEBUG') && WP_DEBUG === true) {
+        // Format the message
+        $timestamp = date('Y-m-d H:i:s');
+        $formatted_message = "[{$timestamp}] [{$level}] WizTrivia: {$message}" . PHP_EOL;
+        
+        // Log to debug.log
+        error_log($formatted_message);
+    }
+}
+
 // Include required files with error checking
 $required_files = [
     'php/functions.php',
@@ -141,17 +154,4 @@ function wiztrivia_activate() {
 register_deactivation_hook(__FILE__, 'wiztrivia_deactivate');
 function wiztrivia_deactivate() {
     // Cleanup code here if needed
-}
-
-// Logging function
-function wiztrivia_log($message, $level = 'info') {
-    // Only log if WP_DEBUG is enabled
-    if (defined('WP_DEBUG') && WP_DEBUG === true) {
-        // Format the message
-        $timestamp = date('Y-m-d H:i:s');
-        $formatted_message = "[{$timestamp}] [{$level}] WizTrivia: {$message}" . PHP_EOL;
-        
-        // Log to debug.log
-        error_log($formatted_message);
-    }
 }
