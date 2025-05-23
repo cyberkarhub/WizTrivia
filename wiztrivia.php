@@ -50,6 +50,34 @@ function wiztrivia_admin_display() {
     require_once WIZTRIVIA_PLUGIN_DIR . 'admin/partials/wiztrivia-admin-display.php';
 }
 
+/**
+ * Register admin menu
+ */
+function wiztrivia_register_admin_menu() {
+    add_menu_page(
+        'WizTrivia',
+        'WizTrivia',
+        'manage_options',
+        'wiztrivia',
+        'wiztrivia_admin_page',
+        'dashicons-games',
+        30
+    );
+}
+add_action('admin_menu', 'wiztrivia_register_admin_menu');
+
+/**
+ * Display admin page
+ */
+function wiztrivia_admin_page() {
+    $file_path = __DIR__ . '/admin/partials/wiztrivia-admin-display.php';
+    if (file_exists($file_path)) {
+        include_once $file_path;
+    } else {
+        echo '<div class="wrap"><h1>WizTrivia</h1><p>Admin display file missing: ' . esc_html($file_path) . '</p></div>';
+    }
+}
+
 // Register admin scripts
 function wiztrivia_admin_scripts($hook) {
     if ('toplevel_page_wiztrivia' !== $hook) {
